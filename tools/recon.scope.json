@@ -1,0 +1,24 @@
+{
+  "_comment": "Hard allowlist. recon.py refuses any target not matched here, before spawning anything. Add entries with 'recon.py allow', which records a reason.",
+  "allowed_cidrs": [
+    {
+      "cidr": "{{IP_192_168_56_0}}/24",
+      "why": "VirtualBox host-only lab segment (legacy)"
+    },
+    {
+      "cidr": "{{IP_10_13_37_0}}/24",
+      "why": "VirtualBox internal-network lab segment (labnet)"
+    }
+  ],
+  "allowed_domains": [
+    {
+      "domain": "scanme.nmap.org",
+      "why": "Nmap's own publicly sanctioned scan target"
+    }
+  ],
+  "_denied_always": "RFC1918 ranges outside the lab, the home LAN {{HOME_LAN_NET}}/22, the Synology, and the {{IP_100_64_0_0}}/10 tailnet are never in scope - those are Lukas's own production network, not targets.",
+  "hard_denied_cidrs": [
+    "{{HOME_LAN_NET}}/22",
+    "{{IP_100_64_0_0}}/10"
+  ]
+}

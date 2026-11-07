@@ -1,0 +1,20 @@
+{
+  "name": "Marty",
+  "short_name": "Marty",
+  "description": "Talk, chat, jobs and files.",
+  "start_url": "/?view=talk",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b1311",
+  "theme_color": "#0b1311",
+  "icons": [
+    {"src":"/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Talk to Marty","short_name":"Talk","url":"/?view=talk","icons":[{"src":"/icons/talk-96.png","sizes":"96x96"}]},
+    {"name":"Marty Jr.","short_name":"Marty Jr.","url":"/?view=more&lane=jr","icons":[{"src":"/icons/jr-96.png","sizes":"96x96"}]},
+    {"name":"New chat","short_name":"New chat","url":"/?view=chat&new=1","icons":[{"src":"/icons/chat-96.png","sizes":"96x96"}]},
+    {"name":"Files from Marty","short_name":"Files","url":"/?view=files","icons":[{"src":"/icons/files-96.png","sizes":"96x96"}]}
+  ]
+}

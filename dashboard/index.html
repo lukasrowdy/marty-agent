@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1311">
+  <title>Marty</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="lock" class="lock" hidden>
+  <form id="loginForm" class="lock-card">
+    <span class="mini-orb"></span><h1>Marty</h1>
+    <p>This device needs its dashboard token.</p>
+    <input id="token" type="password" autocomplete="off" placeholder="Device token" aria-label="Device token">
+    <button>Unlock</button>
+    <button id="passkeyLogin" class="passkey" type="button" hidden>Sign in with passkey</button><small id="loginError"></small>
+  </form>
+</div>
+
+<main id="app" class="shell" hidden>
+  <aside class="left-pane">
+    <div class="brand"><span class="mini-orb"></span><span>Marty</span></div>
+    <button id="personaMarty" class="persona active" data-view="chat"><span class="avatar m">M</span><span><b>Marty</b><small>tools and the vault</small></span></button>
+    <button id="personaJr" class="persona jr-entry" data-view="jr"><span class="avatar j">J</span><span><b>Marty Jr.</b><small>runs only on this PC</small></span></button>
+    <p class="eyebrow">Marty's lanes</p>
+    <div id="lanes" class="lane-list">
+      <button data-lane="claude_sub_tools" class="active">Max + tools <span>$0</span></button>
+      <button data-lane="claude_sub">Claude Max <span>$0</span></button>
+      <button data-lane="codex_sub">Codex <span>$0</span></button>
+      <button data-lane="claude">Claude tools <span>metered</span></button>
+      <button data-lane="gemini">Gemini <span>metered</span></button>
+      <button data-lane="openrouter">OpenRouter <span>metered</span></button>
+      <button data-lane="local">Local <span>$0</span></button>
+      <button data-lane="full" id="laneFull" hidden>Full Marty <span>unlocked = bypass</span></button>
+    </div>
+    <p class="eyebrow">Recent</p>
+    <div id="recent" class="recent"><span>No conversation loaded</span></div>
+  </aside>
+
+  <section class="center-pane">
+    <header class="topbar">
+      <div><h1 id="viewTitle">Talk</h1><label class="lane-pill"><span id="laneLabel">Max + tools · $0</span><select id="laneSelect" aria-label="Lane"><option value="claude_sub_tools">Max + tools · $0</option><option value="claude_sub">Claude Max · $0</option><option value="codex_sub">Codex · $0</option><option value="claude">Claude tools · metered</option><option value="gemini">Gemini · metered</option><option value="openrouter">OpenRouter · metered</option><option value="local">Local · $0</option><option value="full" id="laneFullOpt" hidden disabled>Full Marty · bypass while unlocked</option></select></label></div>
+      <div class="top-actions"><button id="newChat" class="icon-button" title="New chat">＋</button><button id="theme" class="icon-button" title="Theme">◐</button></div>
+    </header>
+
+    <section id="talkView" class="view active">
+      <div class="talk-stage">
+        <div id="orb" class="orb"><span></span><i></i></div>
+        <div id="captions" class="captions"><p><b>Marty</b> Hold the button and talk. Your audio is transcribed on this PC.</p></div>
+      </div>
+      <div class="quick-grid">
+        <button data-view="jobs">◷ What's running</button>
+        <button data-view="files">▱ Send me the latest</button>
+        <button data-prompt="Quiz me on what I'm studying right now, one question at a time.">⌁ Quiz me</button>
+        <button data-prompt="Search my vault for the {{FAMILY_NOTE_1}} note and tell me the status of the latest sort.">≡ Latest sort</button>
+        <button data-view="more" data-open="spend">$ Spend</button>
+        <button data-view="jobs">● Waiting on me <span id="talkWaitingCount" class="count"></span></button>
+      </div>
+      <p id="talkHint" class="talk-hint">hold to talk · tap for hands-free</p>
+      <button id="mic" class="mic" aria-label="Hold to talk"><span>⌁</span></button>
+    </section>
+
+    <section id="chatView" class="view chat-view">
+      <div id="fullBar" class="full-bar" hidden>
+        <span class="full-dot"></span><span id="fullTimer">Full Marty · locks in 15:00</span>
+        <button id="fullLockNow" type="button">Lock now</button>
+      </div>
+      <p id="fullWarn" class="full-warn" hidden></p>
+      <div id="fullLocked" class="full-locked" hidden>
+        <p>Full Marty can run commands and change files on the PC. Unlock it with your passkey.</p>
+        <button id="fullUnlock" type="button">Unlock with passkey</button>
+        <p class="muted" id="fullUnlockError"></p>
+      </div>
+      <div id="messages" class="messages"><div class="empty"><span class="mini-orb"></span><h2>What are we working on?</h2></div></div>
+      <div class="quick-row"><button data-view="jobs">What's running</button><button data-view="files">Files</button><button data-prompt="Quiz me.">Quiz me</button></div>
+      <div id="intake" class="intake" hidden></div>
+      <div id="handoff" class="handoff" hidden><div class="handoff-head"><b>From Marty Jr.</b><span id="handoffStatus"></span><button id="handoffClear" type="button">Clear</button></div><div id="handoffPreview" class="handoff-preview" hidden></div></div>
+      <p id="chatMicStatus" class="jr-mic-status" role="status" aria-live="polite" hidden></p>
+      <form id="composer" class="composer"><input id="file" type="file" hidden><button id="attach" class="attach" type="button" aria-label="Attach a file" title="Attach a file (up to 4 GB, saved on the PC)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5l-8.2 8.2a5 5 0 0 1-7.1-7.1l8.5-8.5a3.4 3.4 0 0 1 4.8 4.8l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button><button id="chatMic" class="jr-mic" type="button" aria-pressed="false" aria-label="Dictate a message (transcribed on this PC)" title="Dictate a message (transcribed on this PC)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button><textarea id="message" rows="1" maxlength="20000" placeholder="Message Marty"></textarea><button id="cancel" type="button" hidden>Stop</button><button id="send" aria-label="Send">➤</button></form>
+    </section>
+
+    <section id="jrView" class="view jr-view" aria-label="Marty Jr.">
+      <div class="jr-head">
+        <span class="local-badge" title="Jr's model and chat stay on this PC. Supervised browsing reaches selected public reference sites from his separate VM. Lock cuts VM power.">Local model · supervised browsing</span>
+        <label class="jr-thread"><select id="jrThreads" aria-label="Marty Jr. conversation"><option value="">New conversation</option></select></label>
+        <button id="jrNew" type="button" class="jr-new">New</button>
+        <button id="jrNeverSendOpen" type="button" class="jr-new" title="Words that must never go to Marty">Never-send</button>
+        <button id="jrLockNow" type="button" class="jr-new" title="Lock Marty Jr. now">Lock</button>
+      </div>
+      <div id="jrMissing" class="jr-notice jr-missing" role="status" hidden><span id="jrMissingText"></span><button id="jrMissingDismiss" type="button" class="jr-new" title="The deletion was on purpose: stop showing this">Dismiss</button></div>
+      <div id="jrLock" class="jr-lock" hidden>
+        <form id="jrLockForm" class="jr-lock-card" autocomplete="off">
+          <h2 id="jrLockTitle">Marty Jr. is locked</h2>
+          <p id="jrLockHint" class="muted">Checking...</p>
+          <input id="jrPass" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Passphrase" aria-label="Passphrase">
+          <input id="jrPass2" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="The same passphrase again" aria-label="The same passphrase again" hidden>
+          <button id="jrUnlock" type="submit">Unlock</button>
+          <small id="jrLockError" role="alert"></small>
+        </form>
+      </div>
+      <div id="jrNeverSend" class="jr-panel" hidden>
+        <h3>Never-send list</h3>
+        <p class="muted small">One per line: names, the school, an address, anything that must never go to Marty. You type these. They are kept inside Jr's encrypted history on this PC, and every "Ask Marty" is checked against them.</p>
+        <textarea id="jrNeverSendTerms" rows="7" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Never-send terms, one per line"></textarea>
+        <div class="jr-panel-actions"><button id="jrNeverSendSave" type="button">Save</button><button id="jrNeverSendClose" type="button" class="jr-new">Close</button><small id="jrNeverSendMsg" class="muted"></small></div>
+      </div>
+      <div id="jrComputerPanel" style="padding:12px;border:1px solid #596476;border-radius:10px;margin:8px 0">
+  <div class="quick-row"><button id="jrComputerStart" type="button">Start supervised VM</button>
+  <button id="jrComputerStop" type="button" style="background:#a51d32;color:white;font-weight:700">Emergency stop VM</button></div>
+  <p id="jrComputerStatus" role="status">VM controls off</p>
+  <div id="jrComputerReview" hidden>
+    <p><strong>VM frozen. Waiting for your decision.</strong></p>
+    <pre id="jrComputerReport" style="white-space:pre-wrap;font:inherit"></pre>
+    <button id="jrComputerApprove" type="button" disabled>Continue · approve next 5 moves</button>
+    <p class="muted">One tap resumes the plan above with his task and screen evidence remembered. Each look, click or key action counts. No tap means no more moves. Memory lasts for this VM session; Lock, Stop or the 15-minute limit ends it.</p>
+    <p class="muted">To change direction, send Jr a new instruction before approving.</p>
+  </div>
+</div>
+      <div id="jrCloudPanel" class="jr-panel">
+        <h3>Large-model tap</h3>
+        <p id="jrCloudStatus" class="muted">Checking provider connection...</p>
+        <p class="muted small">Only the text you place below can leave this PC. The helper receives no screenshot, conversation history, files, or computer controls.</p>
+        <textarea id="jrCloudText" rows="3" maxlength="6000" placeholder="Text to ask the hosted abliterated model" aria-label="Text to send to the large model" autocomplete="off" spellcheck="false"></textarea>
+        <div class="quick-row"><button id="jrCloudReview" type="button">Review cloud request</button><button id="jrCloudSend" type="button" hidden>Send reviewed text</button></div>
+        <pre id="jrCloudPreview" style="white-space:pre-wrap;font:inherit" hidden></pre>
+        <pre id="jrCloudAnswer" style="white-space:pre-wrap;font:inherit" hidden></pre>
+        <button id="jrCloudUse" type="button" hidden>Put advice in Jr's message box</button>
+      </div>
+      <div id="jrMessages" class="messages jr-messages" aria-live="polite"></div>
+      <p id="jrMicStatus" class="jr-mic-status" role="status" aria-live="polite" hidden></p>
+      <form id="jrComposer" class="composer jr-composer" autocomplete="off"><button id="jrMic" class="jr-mic" type="button" aria-pressed="false" aria-label="Record a message for Marty Jr. (transcribed on this PC)" title="Record a message for Marty Jr. (transcribed on this PC)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg></button><textarea id="jrMessage" rows="1" maxlength="20000" placeholder="Message Marty Jr." aria-label="Message Marty Jr." autocomplete="off" spellcheck="false"></textarea><button id="jrCancel" type="button" hidden>Stop</button><button id="jrSend" aria-label="Send to Marty Jr.">➤</button></form>
+    </section>
+
+    <section id="jobsView" class="view list-view"><div class="section-head"><h2>Jobs</h2><button id="refreshJobs">Refresh</button></div>
+      <section id="liveBox" class="live-box" aria-label="Watch Marty work">
+        <button id="liveHead" class="live-head" type="button" aria-expanded="false" aria-controls="liveFeed"><span id="liveDot" class="live-dot"></span><span class="live-title"><b>Watch Marty work</b><small id="liveMeta">Checking...</small></span><span id="liveToggle" class="live-toggle">Open</span></button>
+        <div id="liveFeed" class="live-feed" aria-live="polite" hidden></div>
+      </section>
+      <p id="boardAsOf" class="muted small board-asof"></p>
+      <div id="boardTally" class="board-tally"></div>
+      <h3 class="list-eyebrow">Waiting on you <span id="jobsWaitingCount" class="count"></span></h3><div id="jobsWaiting" class="waiting-list"><p class="muted">Checking...</p></div>
+      <h3 class="list-eyebrow">Running now</h3><div id="jobsList"></div>
+      <h3 class="list-eyebrow">Queued · who's on it</h3><div id="jobsQueued"></div>
+      <details id="jobsDoneBox" class="board-done"><summary>Closed out today <span id="jobsDoneCount" class="muted"></span></summary><div id="jobsDone"></div></details></section>
+    <section id="filesView" class="view list-view"><div class="section-head"><h2>Files from Marty</h2><button id="refreshFiles">Refresh</button></div><div id="filesList"></div></section>
+    <section id="moreView" class="view list-view">
+      <div class="section-head"><h2>More</h2><button id="refreshMore">Refresh</button></div>
+      <div class="card"><h3>Marty Jr.</h3><p>Marty Jr. answers from a model on this PC, with file tools and SpiderFoot. SpiderFoot sends scan targets to external sources and uses temporary plaintext working files, removed after each scan. His model and chat stay local. His microphone is transcribed on this PC and the text waits in his message box until you press Send. His history is encrypted on this PC with your passphrase, and he locks after 15 minutes idle, when the app goes to the background, and at logout. Locking stops SpiderFoot scans and clears their results.</p><button type="button" class="card-link" data-view="jr">Open Marty Jr.</button></div>
+      <div class="segmented" role="tablist" aria-label="More sections"><button data-more="status" class="active" role="tab" aria-selected="true">Status</button><button data-more="spend" role="tab" aria-selected="false">Spend</button><button data-more="activity" role="tab" aria-selected="false">Activity</button></div>
+      <div id="more-status" class="more-panel"><p class="muted">Loading...</p></div>
+      <div id="fullMoreCard" class="card"><h3>Full Marty</h3><p class="muted">Commands and file changes on the PC with no approval cards while unlocked (your key is the permission). Scheduled-task changes push a notice to your phone. Locks after 4 idle hours, 12 at most.</p><button id="fullMoreUnlock" type="button">Full Marty…</button></div>
+      <div id="more-spend" class="more-panel" hidden><p class="muted">Loading...</p></div>
+      <div id="more-activity" class="more-panel" hidden><p class="muted">Loading...</p></div>
+      <div id="passkeyCard" class="card" hidden><h3>Fingerprint sign-in</h3><p id="passkeyInfo" class="muted">Checking...</p><button id="passkeySetup" class="passkey-setup" type="button">Set up fingerprint sign-in</button></div>
+      <button id="logout" class="danger">Log out this device</button>
+    </section>
+  </section>
+
+  <aside class="right-pane">
+    <p class="eyebrow">Running now</p><div id="railJobs" class="rail-list"></div>
+    <p class="eyebrow">Waiting on you <span id="railWaitingCount" class="count"></span></p><div id="railWaiting" class="rail-list"><p class="muted">Checking...</p></div>
+    <p class="eyebrow">Files from Marty</p><div id="railFiles" class="rail-list"></div>
+    <div class="security-note"><b>Tailnet only.</b> The dashboard ends on this PC. Talk audio is transcribed here and deleted.</div>
+  </aside>
+
+  <nav class="bottom-nav">
+    <button data-view="talk" class="active"><span>⌁</span>Talk</button>
+    <button data-view="chat"><span>□</span>Chat</button>
+    <button data-view="jobs"><span>◷</span>Jobs</button>
+    <button data-view="files"><span>▱</span>Files</button>
+    <button data-view="jr"><span>J</span>Jr.</button>
+    <button data-view="more"><span>•••</span>More</button>
+  </nav>
+</main>
+<script src="/app.js" defer></script>
+</body>
+</html>

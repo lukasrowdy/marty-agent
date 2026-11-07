@@ -1,0 +1,137 @@
+# my-agent .gitignore (Marty, 2026-09-28). Rule of thumb: source is tracked, everything
+# that is private, secret, runtime state, a download, or someone else's repo is not.
+# Private GitHub repo; this export is scanned with secret_scan.py and the full private-terms list before every push.
+
+# --- private data: never in history (Lukas, 2026-09-24: private stays in the house)
+private/
+uploads/
+proposals/
+dashboard/outbox/
+jr/history/
+jr/library/
+jr/drafts/
+jr/computer/
+scratchpad/
+tmp/
+deals/business.json
+**/chats/
+**/test-chats/
+**/private_names.json
+dashboard/outbox-source/
+dashboard/Claude outputs/
+tools/screenshots/
+**/shots/
+dashboard/status.json
+tools/local_knowledge/
+tools/avatar.scope.json
+tools/staged-watchers/status.json
+tools/staged-watchers/plan.json
+jack_marty_local/Vault/Backups/
+jack_marty_local/Vault/graph_state.json
+**/seed_placeholder_data.py
+
+# --- secrets and credential stores
+hands/grant.json
+dashboard/passkeys.jsonl
+dashboard/passkeys-user.json
+**/dashboard-devices.jsonl
+**/keyinfo.json
+*.dpapi
+.env
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+
+# --- runtime state, logs, meters, indexes
+logs/
+status/
+vault-index/
+*.jsonl
+*.log
+*.db
+*.sqlite
+*.sqlite3
+*.tmp
+*.lock
+*.stamp
+dashboard/runtime/
+jack_marty_local/cache/
+jack_marty_local/runtime/
+dashboard/.newcode-*/
+nul
+zip_b64.txt
+
+# --- third-party clones with their own git history (not ours to version)
+ai-memory-vault/
+ai-visualizer/
+backtalk/
+facefusion/
+fullstack-agent/
+
+# --- environments, caches, binaries, downloads
+.venv/
+**/.venv/
+__pycache__/
+*.pyc
+*.pyo
+tools/bin/
+tools/platform-tools/
+tools/freezer-frames/
+.staged-ntfy/dl/
+dashboard/.staged-fullmarty/cli/
+**/tests/_tmp/
+*.exe
+*.dll
+*.msi
+*.zip
+*.7z
+*.iso
+*.gguf
+*.onnx
+*.pt
+*.safetensors
+
+# --- media (source images for the dashboard stay tracked; recordings do not)
+*.mp4
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.m4a
+*.flac
+
+# --- backups and rollback copies: git is the history now
+.rollback-*/
+*.bak
+*.bak-*
+*.pre-*
+*.orig
+*.rej
+
+# --- editor and OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# --- staged trees (.staged-*/) are deliberately still tracked: each becomes a
+# branch, then the folder is deleted. Do not add them here until that migration.
+
+# --- Jr runtime state and deploy transcripts (Marty, 2026-09-29, Lukas's yes 12:01 PM): the broker
+# writes its logs, heartbeat and status here; the elevated deploy scripts write their transcripts.
+jr/broker/logs/
+jr/.staged-build/integrated/deploy/logs/
+.staged-ntfy/c4_state.json
+
+# --- Full Marty go-live payload: downloaded Claude CLI binaries (231 MB), not source (2026-09-30)
+dashboard/.staged-fullmarty-deploy/fullmarty/cli/
+
+# --- Retell agent state: holds agent ids today and would hold the custom-LLM websocket URL
+# (which carries the path secret) once setup-brain exists. Never in history (2026-10-03).
+tools/.retell-agent-state.json
+
+# Marty mailbox OAuth client JSON and any other local secret files (2026-10-06, Lukas yes)
+secrets/

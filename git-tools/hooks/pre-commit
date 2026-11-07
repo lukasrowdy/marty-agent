@@ -1,0 +1,50 @@
+#!/usr/bin/env sh
+# pre-commit: run the secret scan on the staged files and refuse the commit when it finds anything.
+# Installed by git-tools/install_hooks.py (core.hooksPath = git-tools/hooks). POSIX sh, runs under
+# Git Bash on Windows (py -3.12) and under any sh elsewhere (python3).
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "pre-commit: not inside a git worktree" >&2; exit 1; }
+SCAN="$ROOT/git-tools/secret_scan.py"
+if [ ! -f "$SCAN" ]; then
+    echo "pre-commit: $SCAN is missing, so the staged files cannot be scanned. Refusing the commit." >&2
+    exit 1
+fi
+
+# Local commits scan with the commit terms list when it exists (the full list minus the Windows
+# username, which every live path on this PC carries); the export's own scan keeps the full list,
+# so the username still never reaches GitHub. Added 2026-10-08 after the username rule refused the
+# live files and a stash taken to get around it reverted them for a day.
+COMMIT_TERMS="${MARTY_PRIVATE_TERMS%.txt}-commit.txt"
+if [ -n "${MARTY_PRIVATE_TERMS:-}" ] && [ -f "$COMMIT_TERMS" ]; then
+    MARTY_PRIVATE_TERMS="$COMMIT_TERMS"
+    export MARTY_PRIVATE_TERMS
+fi
+
+on_windows=0
+case "$(uname -s 2>/dev/null)" in MINGW*|MSYS*|CYGWIN*|Windows*) on_windows=1 ;; esac
+[ "${OS:-}" = "Windows_NT" ] && on_windows=1
+
+if [ "$on_windows" -eq 1 ]; then
+    if command -v py >/dev/null 2>&1; then
+        py -3.12 "$SCAN"
+    else
+        python "$SCAN"
+    fi
+else
+    python3 "$SCAN"
+fi
+status=$?
+
+case "$status" in
+    0) exit 0 ;;
+    1)
+        echo "" >&2
+        echo "pre-commit: the secret scan refused this commit (the lines above say where and which rule)." >&2
+        echo "  Remove or replace the flagged text, or mark a known-safe test fixture with '# secret-scan: allow'." >&2
+        echo "  Bypassing with 'git commit --no-verify' is something only Lukas does." >&2
+        exit 1 ;;
+    *)
+        echo "" >&2
+        echo "pre-commit: the secret scan could not run (exit $status), so the commit is refused." >&2
+        echo "  Fix the cause above, then commit again. 'git commit --no-verify' is something only Lukas does." >&2
+        exit 1 ;;
+esac

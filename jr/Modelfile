@@ -1,0 +1,5 @@
+FROM huihui_ai/qwen3.5-abliterated:35b-a3b
+RENDERER qwen3.5
+PARSER qwen3.5
+PARAMETER presence_penalty 1.5
+PARAMETER num_ctx 16384

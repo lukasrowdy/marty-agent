@@ -1,0 +1,17 @@
+# Passkey sign-in for the dashboard (MJ Dashboard Phase 2, W5), installed into dashboard/.venv.
+#
+# Create:  C:\Users\{{WIN_USER}}\AppData\Local\Programs\Python\Python312\python.exe -m venv --system-site-packages C:\Users\{{WIN_USER}}\my-agent\dashboard\.venv
+# Install: C:\Users\{{WIN_USER}}\my-agent\dashboard\.venv\Scripts\python.exe -m pip install -r C:\Users\{{WIN_USER}}\my-agent\dashboard\requirements-passkeys.txt
+# Check:   C:\Users\{{WIN_USER}}\my-agent\dashboard\.venv\Scripts\python.exe C:\Users\{{WIN_USER}}\my-agent\dashboard\passkeys.py check
+#
+# Installed 2026-09-25: these 5 wheels from PyPI, 695,576 bytes in total. cryptography 50.0.1 (and
+# cffi 2.1.1) are NOT in the venv: they come from the base Python through --system-site-packages.
+# The cryptography range is a guard, not a download: it stops pip from moving the base package past
+# what pyOpenSSL 26.4.0 supports.
+
+webauthn==3.0.1          # sha256 9927b2f530773bd1d7f8194cd643a2e634a20995ea31f2d8f7a3e70b11c93e31   73,910 B
+cbor2==6.1.4             # sha256 cc8cd300e236e9797b2e1ce306109dc481fcccf78bfa2682bf36d99e6eab1ec6  299,971 B (cp312 win_amd64)
+pyasn1==0.6.4            # sha256 deda9277cfd454080ec40b207fb6df82206a3a2688735233cdcd8d3d565f088b   84,410 B
+pyasn1-modules==0.4.2    # sha256 29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a  181,259 B
+pyOpenSSL==26.4.0        # sha256 f0eb0cb2d581d3ad2b9c489468485e7f2ab6727d08401bcf9d824c3caddf3c1c   56,026 B
+cryptography>=49,<51

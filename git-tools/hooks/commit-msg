@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# commit-msg: reject a message with an empty subject or an em dash (U+2014) anywhere in it.
+# The dash check works byte-wise so it behaves the same under Git Bash and Linux.
+MSG=$1
+[ -f "$MSG" ] || { echo "commit-msg: no message file given" >&2; exit 1; }
+EM_DASH=$(printf '\342\200\224')
+
+# Git's own comment lines start with # and are stripped later; ignore them here too.
+body=$(sed -e '/^#/d' "$MSG")
+subject=$(printf '%s\n' "$body" | sed -e '/^[[:space:]]*$/d' | head -n 1)
+
+if [ -z "$subject" ]; then
+    echo "commit-msg: the subject line is empty. Write an imperative subject under 60 characters." >&2
+    exit 1
+fi
+if printf '%s\n' "$body" | LC_ALL=C grep -q -F "$EM_DASH"; then
+    echo "commit-msg: the message contains an em dash. Use a comma, a colon, or a new sentence instead." >&2
+    exit 1
+fi
+if [ "${#subject}" -gt 60 ]; then
+    echo "commit-msg: warning, the subject is ${#subject} characters; the convention is under 60." >&2
+fi
+exit 0

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Marty Jr. / Marty Local Graph</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <div>
+      <p class="eyebrow">LOCAL · LOOPBACK ONLY</p>
+      <h1>Marty Jr. / Marty Graph</h1>
+    </div>
+    <div class="actions">
+      <span id="connectionStatus" role="status" aria-live="polite">Loading graph…</span>
+      <button id="clearCanvasBtn" type="button">Clear Canvas Graph Map</button>
+    </div>
+  </header>
+  <section class="console" aria-label="Marty Jr. and Marty task console">
+    <div class="console-head"><h2>Talk to Marty Jr.</h2><span id="modelName">Checking local model…</span></div>
+    <form id="taskForm" autocomplete="off">
+      <label for="taskText">Task text</label>
+      <textarea id="taskText" maxlength="6000" rows="3" placeholder="Ask Marty Jr. to work locally. Each send is a separate task." required></textarea>
+      <div class="task-actions">
+        <select id="targetBrain" aria-label="Task destination"><option value="jack">Marty Jr. · local only</option><option value="marty">Marty · sanitized handoff</option></select>
+        <button type="submit" id="sendTaskBtn">Send to Marty Jr.</button>
+        <button type="button" id="indexDocsBtn">Index local reference documents</button>
+      </div>
+      <p id="handoffNotice" hidden>Marty receives this task after local abstraction. Enter only instructions and permitted metadata. Private source content belongs with Marty Jr.</p>
+    </form>
+    <p id="taskStatus" role="status" aria-live="polite">Ready for a local task.</p>
+    <pre id="taskReply" aria-live="polite"></pre>
+    <section id="handoffPreview" hidden aria-label="Sanitized handoff preview">
+      <h2>Text Marty will receive</h2>
+      <pre id="cleanTaskText"></pre>
+      <button id="confirmHandoffBtn" type="button">Send this text to Marty</button>
+    </section>
+  </section>
+  <main>
+    <canvas id="graphCanvas" aria-label="Interactive graph map. Drag nodes to rearrange them."></canvas>
+    <aside id="emptyState" hidden>No graph data yet. Authorized local updates will appear here.</aside>
+  </main>
+  <footer><span id="graphCounts">0 nodes · 0 links</span><span>Canvas clear affects this view only.</span></footer>
+  <script src="/graph.js" defer></script>
+  <script src="/console.js" defer></script>
+</body>
+</html>

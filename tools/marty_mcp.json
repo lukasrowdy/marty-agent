@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "marty": {
+      "command": "C:/Users/{{WIN_USER}}/AppData/Local/Programs/Python/Python312/python.exe",
+      "args": ["C:/Users/{{WIN_USER}}/my-agent/tools/marty_tools_mcp.py"]
+    }
+  }
+}
